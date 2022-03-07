@@ -30,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\DocumentoNumeracion::class => [
             \App\Listeners\ConsultarTipoNumeracion::class,
         ],
+        \App\Events\DocumentoNumeracionContingencia::class => [
+            \App\Listeners\ConsultarTipoNumeracionContingencia::class,
+        ],
         \App\Events\ComprobanteRegistrado::class => [
             \App\Listeners\GenerarComprobante::class,
         ],

@@ -290,7 +290,12 @@
 
                         if(data.sunat == '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
                         {
-                            cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
+                            cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ "," +data.contingencia+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
+                        }
+
+                        if(data.sunat_contingencia == '0' && data.tipo_venta_id != 129 && data.contingencia == '1') //&& data.dias > 0
+                        {
+                            cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ "," +data.contingencia+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                         }
 
                         if((data.sunat === '1' || data.notas > 0))
@@ -316,6 +321,11 @@
                         {
                             cadena = cadena +
                             "<button type='button' class='btn btn-sm btn-primary-cdr m-1' onclick='cdr(" + data.id + ")' title='CDR'>CDR</button>";
+                        }
+
+                        if(dias <= 0 && data.contingencia == '0' && data.tipo_venta_id != '129')
+                        {
+                            cadena = cadena + "<button type='button' class='btn btn-sm btn-warning m-1' onclick='contingencia(" +data.id+ ")'  title='Convertir a comprobante de contingencia'><i class='fa fa-exchange'></i> Contingencia</button>";
                         }
 
                         return cadena;
@@ -523,7 +533,7 @@
         })
     }
 
-    function enviarSunat(id , sunat) {
+    function enviarSunat(id , contingencia) {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -544,8 +554,16 @@
         }).then((result) => {
             if (result.value) {
 
-                var url = '{{ route("ventas.documento.sunat", ":id")}}';
-                url = url.replace(':id',id);
+                var url = '';
+
+                if(contingencia == '1') {
+                    url = '{{ route("ventas.documento.sunat.contingencia", ":id")}}';
+                    url = url.replace(':id',id);
+                }
+                else {
+                    url = '{{ route("ventas.documento.sunat", ":id")}}';
+                    url = url.replace(':id',id);
+                }
 
                 window.location.href = url
 

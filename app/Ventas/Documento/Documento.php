@@ -47,6 +47,12 @@ class Documento extends Model
         'serie',
         'ruta_comprobante_archivo',
         'nombre_comprobante_archivo',
+
+        'contingencia',
+        'correlativo_contingencia',
+        'serie_contingencia',
+        'getCdrResponse_contingencia',
+        'getRegularizeResponse_contingencia'
     ];
 
     public function detalles()

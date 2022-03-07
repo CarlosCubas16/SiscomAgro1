@@ -69,6 +69,13 @@ class CreateCotizacionDocumentoTable extends Migration
 
             $table->string('ruta_comprobante_archivo')->nullable();
             $table->string('nombre_comprobante_archivo')->nullable();
+
+            $table->enum('contingencia', ['0', '1'])->default('0');
+            $table->BigInteger('correlativo_contingencia')->nullable();
+            $table->string('serie_contingencia')->nullable();
+            $table->enum('sunat_contingencia', ['0', '1', '2'])->default('0');
+            $table->json('getCdrResponse_contingencia')->nullable();
+            $table->json('getRegularizeResponse_contingencia')->nullable();
             $table->timestamps();
         });
     }

@@ -91,11 +91,13 @@ class DocumentoController extends Controller
                 'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
                 'estado' => $documento->estado,
                 'sunat' => $documento->sunat,
+                'contingencia' => $documento->contingencia,
+                'sunat_contingencia' => $documento->sunat_contingencia,
                 'otros' => 'S/. '.number_format($otros, 2, '.', ''),
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(100 - $diff < 0 ? 0  : 100 - $diff),
+                'dias' => (int)(4 - $diff < 0 ? 0  : 4 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -1024,15 +1026,20 @@ class DocumentoController extends Controller
 
     public function qr_code($id)
     {
-        try{
+        try {
             $documento = Documento::findOrFail($id);
+            $name_qr = '';
 
-            if($documento->sunat == '1')
-            {
+            if ($documento->contingencia == '0') {
+                $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
+            } else {
+                $name_qr  = $documento->serie_contingencia . "-" . $documento->correlativo . '.svg';
+            }
+            if ($documento->sunat == '1') {
                 $arreglo_qr = array(
                     "ruc" => $documento->ruc_empresa,
                     "tipo" => $documento->tipoDocumento(),
-                    "serie" => $documento->serie,
+                    "serie" => $documento->contingencia == '0' ? $documento->serie : $documento->serie_contingencia,
                     "numero" => $documento->correlativo,
                     "emision" => self::obtenerFechaEmision($documento),
                     "igv" => 18,
@@ -1044,49 +1051,63 @@ class DocumentoController extends Controller
                 /********************************/
                 $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
 
-                $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
+                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 
-                $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
-
-                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
-                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
+                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
                 }
 
                 file_put_contents($pathToFile_qr, $data_qr);
 
-                $documento->ruta_qr = 'public/qrs/'.$name_qr;
+                $documento->ruta_qr = 'public/qrs/' . $name_qr;
                 $documento->update();
 
-                return array('success' => true,'mensaje' => 'QR creado exitosamente');
+                return array('success' => true, 'mensaje' => 'QR creado exitosamente');
             }
 
-            if($documento->sunat == '0'){
-                $miQr = QrCode::
-                        format('svg')
-                        ->size(130)  //defino el tamaño
-                        ->backgroundColor(0, 0, 0) //defino el fondo
-                        ->color(255, 255, 255)
-                        ->margin(1)  //defino el margen
-                        ->generate($documento->ruc_empresa.'|'.$documento->tipoDocumento().'|'.$documento->serie.'|'.$documento->correlativo.'|'.$documento->total_igv.'|'.$documento->total.'|'.getFechaFormato( $documento->fecha_emision ,'d/m/Y'));
+            if ($documento->sunat == '0' && $documento->contingencia == '0') {
+                $miQr = QrCode::format('svg')
+                    ->size(130)  //defino el tamaño
+                    ->backgroundColor(0, 0, 0) //defino el fondo
+                    ->color(255, 255, 255)
+                    ->margin(1)  //defino el margen
+                    ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
 
-                $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
+                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 
-                $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
-
-                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
-                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
+                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
                 }
 
                 file_put_contents($pathToFile_qr, $miQr);
 
-                $documento->ruta_qr = 'public/qrs/'.$name_qr;
+                $documento->ruta_qr = 'public/qrs/' . $name_qr;
                 $documento->update();
-                return array('success' => false,'mensaje' => 'Ya tiene QR');
+                return array('success' => false, 'mensaje' => 'Ya tiene QR');
             }
-        }
-        catch(Exception $e)
-        {
-            return array('success' => false,'mensaje' => $e->getMessage());
+
+            if ($documento->sunat_contingencia == '0' && $documento->contingencia == '1') {
+                $miQr = QrCode::format('svg')
+                    ->size(130)  //defino el tamaño
+                    ->backgroundColor(0, 0, 0) //defino el fondo
+                    ->color(255, 255, 255)
+                    ->margin(1)  //defino el margen
+                    ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
+
+                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
+
+                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
+                }
+
+                file_put_contents($pathToFile_qr, $miQr);
+
+                $documento->ruta_qr = 'public/qrs/' . $name_qr;
+                $documento->update();
+                return array('success' => false, 'mensaje' => 'Ya tiene QR');
+            }
+        } catch (Exception $e) {
+            return array('success' => false, 'mensaje' => $e->getMessage());
         }
     }
 
