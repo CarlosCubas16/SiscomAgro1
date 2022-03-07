@@ -506,7 +506,7 @@ class ComprobanteController extends Controller
                                 Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
                                 return view('ventas.documentos.index', [
                                     'id_sunat' =>  $id_sunat,
-                                    'descripcion_sunat' =>  $descripcion_sunat,
+                                    'descripcion_sunat' =>  (string)$descripcion_sunat,
                                     'sunat_error' => true,
 
                                 ])->with('sunat_error', 'error');
