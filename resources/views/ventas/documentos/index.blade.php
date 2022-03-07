@@ -412,6 +412,36 @@
         })
     }
 
+    function contingencia(id) {
+
+    Swal.fire({
+        title: 'Contingencia',
+        text: "¿Seguro que desea convertir este documento a comprobante de contingencia?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: "#1ab394",
+        confirmButtonText: 'Si, Confirmar',
+        cancelButtonText: "No, Cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            //Ruta Eliminar
+            var url_contingencia = '{{ route("ventas.documento.contingencia", ":id")}}';
+            url_contingencia = url_contingencia.replace(':id', id);
+            $(location).attr('href', url_contingencia);
+
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'La Solicitud se ha cancelado.',
+                'error'
+            )
+        }
+    })
+}
+
     function modificar(cotizacion,id) {
         if (cotizacion) {
             toastr.error('El documento de venta fue generado por una cotización (Opción "Editar" en cotizaciones).', 'Error');
