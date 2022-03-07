@@ -298,11 +298,16 @@
                             cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ "," +data.contingencia+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                         }
 
-                        if((data.sunat === '1' || data.notas > 0))
+                        if((data.sunat == '1' || data.notas > 0 || data.sunat_contingencia == '1') && data.tipo_venta_id != 129)
                         {
                             cadena = cadena  +
-                            "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>"
-                            + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>" ;
+                            "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>";
+                        }
+
+                        if(data.sunat == '1'  || data.sunat_contingencia == '1')
+                        {
+                            cadena = cadena + 
+                            + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>";
                         }
 
                         if(data.tipo_venta_id == 129)
