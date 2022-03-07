@@ -306,8 +306,7 @@
 
                         if(data.sunat == '1'  || data.sunat_contingencia == '1')
                         {
-                            cadena = cadena + 
-                            + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>";
+                            cadena = cadena + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>";
                         }
 
                         if(data.tipo_venta_id == 129)
