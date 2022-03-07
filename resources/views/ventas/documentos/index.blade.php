@@ -314,7 +314,7 @@
                         if(data.dias == 0 && data.sunat != '1')
                         {
                             cadena = cadena +
-                            "<button type='button' class='btn btn-sm btn-danger m-1' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
+                            "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
                         }
 
                         if(data.code == '1033' && data.regularize == '1')
