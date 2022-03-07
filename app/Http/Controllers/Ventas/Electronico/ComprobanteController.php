@@ -399,7 +399,7 @@ class ComprobanteController extends Controller
                             "legends" =>  self::obtenerLeyenda($documento),
                         );
 
-                        return $arreglo_comprobante;
+                        // return $arreglo_comprobante;
                         //OBTENER JSON DEL COMPROBANTE EL CUAL SE ENVIARA A SUNAT
                         $data = enviarComprobanteapi(json_encode($arreglo_comprobante), $documento->empresa_id);
 
